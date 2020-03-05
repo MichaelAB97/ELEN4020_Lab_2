@@ -188,7 +188,6 @@ int main()
 
     cout << "\nTransposed Matrix";
     DisplayMatrix(matrix,N);
-    cout << "Elapsed Time in Seconds: " << elapsedTime.count() << endl;
 
     return 0;
 }
