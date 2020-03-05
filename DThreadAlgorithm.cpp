@@ -68,9 +68,9 @@ int getElement(int* matrix_ptr, int coords[2], int N)
 
 void transposeElement(int* row_element, int* col_element)
 {
-    int* temp = row_element;
+    int temp = *row_element;
     *row_element = *col_element;
-    *col_element = *temp;
+    *col_element = temp;
 }
 
 
@@ -138,7 +138,7 @@ void *DiagonalThreadTransposition(void *arg)
 
 void DiagonalThreadManager(int* matrix, int N)
 {
-    int rc;
+    int thread_check;
     pthread_t thread_matrix[num_threads];
     ThreadDataStruct threads_traits[num_threads]; 
 
@@ -158,11 +158,11 @@ void DiagonalThreadManager(int* matrix, int N)
 
 
 
-        rc = pthread_create(&thread_matrix[i], NULL, DiagonalThreadTransposition, &threads_traits[i]);
+        thread_check = pthread_create(&thread_matrix[i], NULL, DiagonalThreadTransposition, &threads_traits[i]);
         
 
 
-        if(rc)
+        if(thread_check)
         {
             cout<< "ERROR creating thread."<<endl;
             exit(-1);
