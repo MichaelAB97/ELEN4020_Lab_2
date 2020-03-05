@@ -178,16 +178,26 @@ void DiagonalThreadManager(int* matrix, int N)
 
 int main()
 {
-    int N = 2; //Size of the Matrix
+    int N = 128; //Size of the Matrix
     int* matrix = GenerateMatrix(N);
-    int* matrix_T = allocateMatrix(N);
 
     cout << "Original Matrix";
     DisplayMatrix(matrix, N);
+
+    //Start the steady clock-----------------------------------------------------------------------------------------
+    std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
+    startClock = std::chrono::steady_clock::now();
+    
     DiagonalThreadManager(matrix, N);
+    
+    //Pause the steady clock------------------------------------------------------------------------------------------
+    endClock = std::chrono::steady_clock::now();
+    std::chrono::duration<double>elapsedTime = duration_cast<duration<double>>(endClock - startClock);
 
     cout << "\nTransposed Matrix";
-    DisplayMatrix(matrix,N);
+    DisplayMatrix(matrix, N);
+
+    cout << "\nElapsed Time in Seconds: " << elapsedTime.count() << endl;
 
     return 0;
 }
