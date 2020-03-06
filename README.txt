@@ -1,14 +1,12 @@
+Build Tools:
+The build tool used to build and compile the source codes is makefile. The terminal commands used to run the source codes are listed below.
 
-------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------
+Terminal Command To execute DThreadAlgorithm.cpp
+./DThreadAlg
 
-Build Process: PThreads
+Terminal Command To execute BlockThreadAlgorithm.cpp
+./BlockThreadAlg
 
-To Compile DThreadAlgorithm.cpp:
-g++ -o DTAlg DThreadAlgorithm.cpp -lpthread
 
-To run use:
-./DTAlg
-
--------------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------
+To get rid of any binary files created in the build process type: " make clean " 
+in the terminal command window
