@@ -32,6 +32,8 @@ typedef struct{
 }BlockThreadStruct;
 
 
+/* This function dynamically generates a pointer to the first element of the matrix and populates 
+   the matrix with random numbers according to a randomly generated seed value between 0 and 100 */
 int* GenerateMatrix(int N)
 {
     int dimension = N*N;
@@ -50,6 +52,7 @@ int* GenerateMatrix(int N)
     return matrix;
 }
 
+//This Function displays the 2D matrix
 void DisplayMatrix(int *matrix, int N)
 {
     int dimension = N*N;
@@ -63,7 +66,9 @@ void DisplayMatrix(int *matrix, int N)
 	cout << endl;
 }
 
-int getElementCoords(int coords[2], int N)
+/* This function makes use of an elements coordinates in the 2D matrix and returns the
+   element's position in the 1D matrix that was initially created. */
+int getElementPosition(int coords[2], int N)
 {
 	int row = coords[0];
 	int col = coords[1];
@@ -72,6 +77,7 @@ int getElementCoords(int coords[2], int N)
     return position;
 }
 
+/* This function returns a pointer to the first element of a block */
 int *blockElement(int blockIndex, int N)
 {	
 	int block_number = N/2;
@@ -85,6 +91,9 @@ int *blockElement(int blockIndex, int N)
 	return block_element_ptr;
 }
 
+/* This function takes in two elements and assigns each variable the other variable's value
+   by the use of a temp variable. For example: if a = 2 & b = 1, the result of the transposElement 
+   function will be a = 1 and b = 2 */
 void transposeElement(int* row_element, int* col_element)
 {
 	int temp = *row_element;
@@ -92,6 +101,7 @@ void transposeElement(int* row_element, int* col_element)
     *col_element = temp;
 }
 
+/* This function does matrix transposition on a single block */
 void blockElementsTranspose(int *matrix, int *block_ij, int *block_ji)
 {	
     for (int i = 0; i < 4; i++)
@@ -100,11 +110,15 @@ void blockElementsTranspose(int *matrix, int *block_ij, int *block_ji)
     }
 }
 
+/* This function transposes the first elements of the blocks needed to be transposed */
 void blockTranspose(int *matrix, int *block_ptr)
 {
 	transposeElement(matrix+block_ptr[1], matrix+block_ptr[2]);
 }
 
+/* This function assigns each thread a transposition operation based on the operation index. 
+   A mutex lock is used to ensure that the threads wait for the thread that is 
+   currently accessing data to complete its operation before the next operation is executed.*/
 void *BlockThreadTransposition(void *arg)
 {
 	BlockThreadStruct* block_thread = (BlockThreadStruct*)arg;
@@ -114,7 +128,7 @@ void *BlockThreadTransposition(void *arg)
 	for(int i=block_thread->diagonal_index; i<block_number; ++i)
 	{
 		int element_coords[2] = {block_thread->diagonal_index,i};
-		int block_1 = getElementCoords(element_coords, block_number);
+		int block_1 = getElementPosition(element_coords, block_number);
 		int *blockElements_1 = blockElement( block_1, matrix_size);
 		blockTranspose(block_thread->matrix, blockElements_1);
 			
@@ -123,7 +137,7 @@ void *BlockThreadTransposition(void *arg)
 			element_coords[0] = i;
 			element_coords[1] = block_thread->diagonal_index;		
 
-			int block_2 = getElementCoords(element_coords, block_number);
+			int block_2 = getElementPosition(element_coords, block_number);
 			int *blockElements_2 = blockElement( block_2, matrix_size);
 			blockTranspose(block_thread->matrix, blockElements_2);
 			blockElementsTranspose(block_thread->matrix, blockElements_1, blockElements_2);
@@ -143,6 +157,7 @@ void *BlockThreadTransposition(void *arg)
 	pthread_exit((void *) 0);	
 }
 
+/* This function creates threads and a struct of threads based on the number of threads defined.*/
 void BlockThreadManager(int* matrix, int N)
 {
 	int thread_check;
@@ -150,8 +165,11 @@ void BlockThreadManager(int* matrix, int N)
 	pthread_t threads[num_threads];
 	BlockThreadStruct threads_traits[num_threads];
 	
+    /* Updates the operation index for the threads so that if a thread has completed it's
+       assigned operation, it will go and execute the next available operation */ 
 	next_block_diagonal = num_threads;
 	
+    // Initializing the information in the struct for each thread and each thread is assigned an operation
 	for(int i=0; i < num_threads; ++i)
 	{
 		threads_traits[i].thread_ID = i;
@@ -162,23 +180,26 @@ void BlockThreadManager(int* matrix, int N)
 		
 		thread_check = pthread_create(&threads[i], NULL, BlockThreadTransposition, &threads_traits[i]);
 		
+        //Error condition: If the pthreads are created successfully, 0 is returned
+        //If threads are not created successfully, an error message will be output and the program will terminate 
 		if(thread_check)
 		{
-			cout << "Thread not Created";
+			cout << "Threads were not created successfully";
 			EXIT_FAILURE;
 		}
 	}
-	
+	//scheduling the joining of the threads
 	for(int j = 0; j < num_threads; ++j) pthread_join(threads[j], NULL);
 }
 
 int main()
 {
-    int N = 4; //Size of the Matrix
+    int N = 4096; //Size of the Matrix
     int* matrix = GenerateMatrix(N);
 
-    cout << "Original Matrix";
-    DisplayMatrix(matrix, N);
+    //Uncomment the following two lines to view the original NxN Matrix output
+    /*cout << "Original Matrix";
+    DisplayMatrix(matrix, N);*/
 
     //Start the steady clock
     std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
@@ -190,10 +211,13 @@ int main()
     endClock = std::chrono::steady_clock::now();
     std::chrono::duration<double>elapsedTime = duration_cast<duration<double>>(endClock - startClock);
 
-    cout << "\nTransposed Matrix";
-    DisplayMatrix(matrix, N);
+    //Uncomment the following two lines to view the NxN matrix transposition output
+    /*cout << "\nTransposed Matrix";
+    DisplayMatrix(matrix, N);*/
 
-    cout << "\nElapsed Time in Seconds: " << elapsedTime.count() << endl;
+    cout << "Number of Threads: " << num_threads << endl;
+    cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
+    cout << "Elapsed (Block Transposition) Time in Seconds: " << elapsedTime.count() << endl;
 
     return 0;
 }

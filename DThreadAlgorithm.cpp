@@ -31,7 +31,8 @@ typedef struct{
     int N;
 }ThreadDataStruct;
 
-
+/* This function dynamically generates a pointer to the first element of the matrix and populates 
+   the matrix with random numbers according to a randomly generated seed value between 0 and 100 */
 int* GenerateMatrix(int N)
 {
     int dimension = N*N;
@@ -50,8 +51,9 @@ int* GenerateMatrix(int N)
     return matrix;
 }
 
-
-int getElementPosition2D(int coords[2], int N)
+/* This function makes use of an elements coordinates in the 2D matrix and returns the
+   element's position in the 1D matrix that was initially created. */
+int getElementPosition(int coords[2], int N)
 {
     int row = coords[0];
     int col = coords[1];
@@ -60,12 +62,16 @@ int getElementPosition2D(int coords[2], int N)
 }
 
 
+/* This function returns the value of the element by shifting the matrix element pointer
+   by the position returned from the getElementPosition function */
 int getElement(int* matrix_ptr, int coords[2], int N)
 {
-    return *(matrix_ptr + getElementPosition2D(coords,N));
+    return *(matrix_ptr + getElementPosition(coords,N));
 }
 
-
+/* This function takes in two elements and assigns each variable the other variable's value
+   by the use of a temp variable. For example: if a = 2 & b = 1, the result of the transposElement 
+   function will be a = 1 and b = 2 */
 void transposeElement(int* row_element, int* col_element)
 {
     int temp = *row_element;
@@ -73,7 +79,7 @@ void transposeElement(int* row_element, int* col_element)
     *col_element = temp;
 }
 
-
+//This Function displays the 2D matrix
 void DisplayMatrix(int* matrix, int N)
 {
     int dimension = N*N;
@@ -91,17 +97,9 @@ void DisplayMatrix(int* matrix, int N)
 
 }
 
-
-
-int* allocateMatrix(int N)
-{
-    int dimension = N*N;
-    int* result = (int*)calloc(dimension, sizeof(int));
-    return result;
-}
-
-
-
+/* This function assigns each thread a diagonal transposition operation based on the operation index. 
+   A mutex lock is used to ensure that the threads wait for the thread that is 
+   currently accessing data to complete its operation before the next operation is executed.*/
 void *DiagonalThreadTransposition(void *arg)
 {
     ThreadDataStruct* diagonalThread = (ThreadDataStruct*)arg;
@@ -111,10 +109,10 @@ void *DiagonalThreadTransposition(void *arg)
         for (int i = d_Index+1; i < matrix_size; ++i)
         {
             int element_coords[2] = {diagonalThread->diagonal_index, i};
-            int rowElement = getElementPosition2D(element_coords,matrix_size);
+            int rowElement = getElementPosition(element_coords,matrix_size);
             element_coords[0] = i;
             element_coords[1] = diagonalThread->diagonal_index;
-            int colElement = getElementPosition2D(element_coords,matrix_size);
+            int colElement = getElementPosition(element_coords,matrix_size);
             transposeElement(diagonalThread->matrix+rowElement, diagonalThread->matrix+colElement);
         }
         
@@ -132,15 +130,18 @@ void *DiagonalThreadTransposition(void *arg)
     pthread_exit((void*)0);
 } 
 
-
+/* This function creates threads and a struct of threads based on the number of threads defined.*/
 void DiagonalThreadManager(int* matrix, int N)
 {
     int thread_check;
     pthread_t threads[num_threads];
     ThreadDataStruct threads_traits[num_threads]; 
 
-    next_diagonal = (int)num_threads; 
+    /* Updates the operation index for the threads so that if a thread has completed it's
+       assigned operation, it will go and execute the next available operation */ 
+    next_diagonal = num_threads; 
 
+    // Initializing the information in the struct for each thread and each thread is assigned an operation
     for(int i=0; i < num_threads; ++i)
     {
         
@@ -151,14 +152,16 @@ void DiagonalThreadManager(int* matrix, int N)
 
         thread_check = pthread_create(&threads[i], NULL, DiagonalThreadTransposition, &threads_traits[i]);
         
+        //Error condition: If the pthreads are created successfully, 0 is returned
+        //If threads are not created successfully, an error message will be output and the program will terminate 
         if(thread_check)
         {
-            cout<< "ERROR creating thread."<<endl;
+            cout<< "Threads were not created successfully"<<endl;
             EXIT_FAILURE;
         }
     }
 
-
+    //scheduling the joining of the threads
     for(int i = 0; i< num_threads; i++) 
     {
         pthread_join(threads[i],NULL);
@@ -167,11 +170,12 @@ void DiagonalThreadManager(int* matrix, int N)
 
 int main()
 {
-    int N = 6; //Size of the Matrix
+    int N = 4096; //Size of the Matrix
     int* matrix = GenerateMatrix(N);
 
-    cout << "Original Matrix";
-    DisplayMatrix(matrix, N);
+    //Uncomment the following two lines to view the original NxN Matrix output
+    /*cout << "Original Matrix";
+    DisplayMatrix(matrix, N);*/
 
     //Start the steady clock
     std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
@@ -183,10 +187,13 @@ int main()
     endClock = std::chrono::steady_clock::now();
     std::chrono::duration<double>elapsedTime = duration_cast<duration<double>>(endClock - startClock);
 
-    cout << "\nTransposed Matrix";
-    DisplayMatrix(matrix, N);
+    //Uncomment the following two lines to view the NxN matrix transposition output
+    /*cout << "\nTransposed Matrix";
+    DisplayMatrix(matrix, N);*/
 
-    cout << "\nElapsed Time in Seconds: " << elapsedTime.count() << endl;
+    cout << "Number of Threads: " << num_threads << endl;
+    cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
+    cout << "Elapsed (Block Transposition) Time in Seconds: " << elapsedTime.count() << endl;
 
     return 0;
 }
