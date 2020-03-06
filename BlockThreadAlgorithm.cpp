@@ -180,9 +180,20 @@ int main()
     cout << "Original Matrix";
     DisplayMatrix(matrix, N);
 
-    cout << "\nTransposed Matrix";
+    //Start the steady clock
+    std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
+    startClock = std::chrono::steady_clock::now();
+
     BlockThreadManager(matrix, N);
+
+    //Pause the steady clock
+    endClock = std::chrono::steady_clock::now();
+    std::chrono::duration<double>elapsedTime = duration_cast<duration<double>>(endClock - startClock);
+
+    cout << "\nTransposed Matrix";
     DisplayMatrix(matrix, N);
+
+    cout << "\nElapsed Time in Seconds: " << elapsedTime.count() << endl;
 
     return 0;
 }
