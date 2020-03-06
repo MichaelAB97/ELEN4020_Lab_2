@@ -50,6 +50,7 @@ int* GenerateMatrix(int N)
     return matrix;
 }
 
+
 int getElementPosition2D(int coords[2], int N)
 {
     int row = coords[0];
@@ -63,6 +64,7 @@ int getElement(int* matrix_ptr, int coords[2], int N)
 {
     return *(matrix_ptr + getElementPosition2D(coords,N));
 }
+
 
 void transposeElement(int* row_element, int* col_element)
 {
@@ -121,12 +123,11 @@ void *DiagonalThreadTransposition(void *arg)
         {
             diagonalThread->diagonal_index = next_diagonal;
             ++next_diagonal;
-            cout << next_diagonal << endl;
         }
         else diagonalThread->diagonal_index = matrix_size - 1;
         pthread_mutex_unlock(&diagonal_Lock);
 
-        if(diagonalThread->diagonal_index == matrix_size-1) exit(-1);
+        if(diagonalThread->diagonal_index == matrix_size-1) EXIT_SUCCESS;
     
     pthread_exit((void*)0);
 } 
@@ -135,14 +136,10 @@ void *DiagonalThreadTransposition(void *arg)
 void DiagonalThreadManager(int* matrix, int N)
 {
     int thread_check;
-    pthread_t thread_matrix[num_threads];
+    pthread_t threads[num_threads];
     ThreadDataStruct threads_traits[num_threads]; 
 
-
-
     next_diagonal = (int)num_threads; 
-
-
 
     for(int i=0; i < num_threads; ++i)
     {
@@ -152,29 +149,25 @@ void DiagonalThreadManager(int* matrix, int N)
         threads_traits[i].matrix = matrix;
         threads_traits[i].N = N;
 
-
-
-        thread_check = pthread_create(&thread_matrix[i], NULL, DiagonalThreadTransposition, &threads_traits[i]);
+        thread_check = pthread_create(&threads[i], NULL, DiagonalThreadTransposition, &threads_traits[i]);
         
-
-
         if(thread_check)
         {
             cout<< "ERROR creating thread."<<endl;
-            exit(-1);
+            EXIT_FAILURE;
         }
     }
 
 
     for(int i = 0; i< num_threads; i++) 
     {
-        pthread_join(thread_matrix[i],NULL);
+        pthread_join(threads[i],NULL);
     }
 }
 
 int main()
 {
-    int N = 128; //Size of the Matrix
+    int N = 6; //Size of the Matrix
     int* matrix = GenerateMatrix(N);
 
     cout << "Original Matrix";
