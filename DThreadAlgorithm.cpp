@@ -108,8 +108,6 @@ void *DiagonalThreadTransposition(void *arg)
     int matrix_size = diagonalThread->N;
     int d_Index = diagonalThread->diagonal_index;
 
-    while(true)
-    {
         for (int i = d_Index+1; i < matrix_size; ++i)
         {
             int element_coords[2] = {diagonalThread->diagonal_index, i};
@@ -130,8 +128,8 @@ void *DiagonalThreadTransposition(void *arg)
         else diagonalThread->diagonal_index = matrix_size - 1;
         pthread_mutex_unlock(&diagonal_Lock);
 
-        if(diagonalThread->diagonal_index == matrix_size-1) break;
-    }
+        if(diagonalThread->diagonal_index == matrix_size-1) exit(-1);
+    
     pthread_exit((void*)0);
 } 
 
@@ -184,13 +182,13 @@ int main()
     cout << "Original Matrix";
     DisplayMatrix(matrix, N);
 
-    //Start the steady clock-----------------------------------------------------------------------------------------
+    //Start the steady clock
     std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
     startClock = std::chrono::steady_clock::now();
     
     DiagonalThreadManager(matrix, N);
     
-    //Pause the steady clock------------------------------------------------------------------------------------------
+    //Pause the steady clock
     endClock = std::chrono::steady_clock::now();
     std::chrono::duration<double>elapsedTime = duration_cast<duration<double>>(endClock - startClock);
 
