@@ -193,7 +193,7 @@ int main()
 
     cout << "Number of Threads: " << num_threads << endl;
     cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
-    cout << "Elapsed (Block Transposition) Time in Seconds: " << elapsedTime.count() << endl;
+    cout << "Elapsed (Diagonal Transposition) Time in Seconds: " << elapsedTime.count() << endl;
 
     return 0;
 }
