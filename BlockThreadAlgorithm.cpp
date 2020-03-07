@@ -11,9 +11,6 @@
 using namespace std;
 using namespace std::chrono;
 
-// Defining the number threads to be used in the program
-#define num_threads 8
-
 // Operation Counter
 int next_block_diagonal  = 0;
 
@@ -158,7 +155,7 @@ void *BlockThreadTransposition(void *arg)
 }
 
 /* This function creates threads and a struct of threads based on the number of threads defined.*/
-void BlockThreadManager(int* matrix, int N)
+void BlockThreadManager(int* matrix, int N, int num_threads)
 {
 	int thread_check;
 	
@@ -195,6 +192,7 @@ void BlockThreadManager(int* matrix, int N)
 int main()
 {
     int N = 4096; //Size of the Matrix
+	int num_threads = 8; // Number of threads
     int* matrix = GenerateMatrix(N);
 
     //Uncomment the following two lines to view the original NxN Matrix output
@@ -205,7 +203,7 @@ int main()
     std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
     startClock = std::chrono::steady_clock::now();
 
-    BlockThreadManager(matrix, N);
+    BlockThreadManager(matrix, N, num_threads);
 
     //Pause the steady clock
     endClock = std::chrono::steady_clock::now();
@@ -217,7 +215,7 @@ int main()
 
     cout << "Number of Threads: " << num_threads << endl;
     cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
-    cout << "Elapsed (Block Transposition) Time in Seconds: " << elapsedTime.count() << endl;
+    cout << "Block Transposition Elapsed Time in Seconds: " << elapsedTime.count() << endl;
 
     return 0;
 }
