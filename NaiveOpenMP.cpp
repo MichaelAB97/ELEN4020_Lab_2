@@ -66,10 +66,13 @@ int* transposeMatrix(int N, int* matrix_ptr)
     int *transposedMatrix =  (int* )calloc(dimension, sizeof(int));
     int *transposedElementPtr = transposedMatrix;
 
-    for (int row=0; row<N; row++)
-    {
-        for (int col=0; col<N; col++)
+     #pragma omp parallel num_threads(3)
+    {   
+        #pragma omp for
+        for (int row=0; row<N; row++)
         {
+            for (int col=0; col<N; col++)
+            {
             int oldCoords[2] = {row, col};
             int oldPosition = getElementPosition(oldCoords, N);
             int element = getElement(matrix_ptr, oldCoords, N);
@@ -77,6 +80,7 @@ int* transposeMatrix(int N, int* matrix_ptr)
             int newCoords[2] = {col, row};
             int newPosition = getElementPosition(newCoords, N);
             *(transposedMatrix + newPosition) = element;
+            }
         }
     }
 
