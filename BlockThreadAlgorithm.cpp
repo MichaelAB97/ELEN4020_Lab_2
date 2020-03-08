@@ -1,5 +1,4 @@
 // Diagonal Matrix Transposition Algorithm using Threads
-
 #include <pthread.h>
 #include <stdlib.h>
 #include <iostream>
@@ -191,7 +190,7 @@ void BlockThreadManager(int* matrix, int N, int num_threads)
 
 int main()
 {
-    int N = 4096; //Size of the Matrix
+    int N = 128; //Size of the Matrix
 	int num_threads = 8; // Number of threads
     int* matrix = GenerateMatrix(N);
 
@@ -213,7 +212,7 @@ int main()
     /*cout << "\nTransposed Matrix";
     DisplayMatrix(matrix, N);*/
 
-    cout << "Number of Threads: " << num_threads << endl;
+    cout << "\nNumber of Threads: " << num_threads << endl;
     cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
     cout << "Block Transposition Elapsed Time in Seconds: " << elapsedTime.count() << endl;
 
