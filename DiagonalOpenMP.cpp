@@ -1,0 +1,120 @@
+// Diagonal Transposition Algorithm using OpenMp
+#include <iostream>
+#include <stdlib.h>
+#include <chrono>
+#include <omp.h>
+
+using namespace std;
+using namespace std::chrono;
+
+int* GenerateMatrix(int N)
+{
+    int dimension = N*N;
+    int seed = rand()%100;
+    srand(seed);
+
+    int *matrix =  (int* )calloc(dimension, sizeof(int));
+    int *element_ptr = matrix;
+
+    for (int i = 0; i < dimension; ++i)
+    {
+        *element_ptr = rand()%N;
+        element_ptr++;
+    }
+    
+    return matrix;
+}
+
+
+int getElementPosition(int coords[2], int N)
+{
+    int row = coords[0];
+    int col = coords[1];
+    int position = (row*N) + col;
+    return position;
+}
+
+
+void transposeElement(int* row_element, int* col_element)
+{
+    int temp = *row_element;
+    *row_element = *col_element;
+    *col_element = temp;
+}
+
+
+void DisplayMatrix(int* matrix, int N)
+{
+    int dimension = N*N;
+
+    for (int i = 0; i < dimension; ++i)
+    {
+        if (i % N == 0)
+        {
+            cout << endl;
+        }
+        cout << *matrix << " ";
+        ++matrix;
+    }
+    cout << endl;
+
+}
+
+
+void DiagonalTransposition(int* matrix, int N, int num_threads)
+{   
+    omp_set_num_threads(num_threads); //set number of threads
+
+    //Defining a specification of how iterations of associated loops are divided into contiguous non-empty subsets
+    int chunk_size = 10; // non-empty subsets
+
+    #pragma omp parallel private(next_diagonal)
+    {
+        #pragma omp for schedule(dynamic, chunk_size) nowait
+        for (int i = 0; i < N-1; ++i)
+        {
+            for (int j = i+1; j < N; ++j)
+            {
+                int element_coords[2] = {i,j};
+                int element_position_1 = getElementPosition(element_coords,N);
+                element_coords[0] = j;
+                element_coords[1] = i;
+                int element_position_2 = getElementPosition(element_coords,N);
+                transposeElement(matrix+element_position_1, matrix+element_position_2);
+            }
+            
+        }
+        
+    }
+}
+
+
+int main()
+{
+    int N = 128;
+    int num_threads = 8;
+    int* matrix = GenerateMatrix(N);
+
+    /*cout << "Original Matrix";
+    DisplayMatrix(matrix, N);*/
+
+    //Start the steady clock
+    std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
+    startClock = std::chrono::steady_clock::now();
+    
+    DiagonalTransposition(matrix, N, num_threads);
+    
+    //Pause the steady clock
+    endClock = std::chrono::steady_clock::now();
+    std::chrono::duration<double>elapsedTime = duration_cast<duration<double>>(endClock - startClock);
+
+    //Uncomment the following two lines to view the NxN matrix transposition output
+    /*cout << "\nTransposed Matrix";
+    DisplayMatrix(matrix, N);*/
+
+    cout << "\nNumber of Threads: " << num_threads << endl;
+    cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
+    cout << "Diagonal Transposition Elapsed Time in Seconds: " << elapsedTime.count() << endl; 
+
+    return 0; 
+}
