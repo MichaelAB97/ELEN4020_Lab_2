@@ -137,7 +137,9 @@ void *BlockThreadTransposition(void *arg)
 			int *blockElements_2 = blockElement( block_2, matrix_size);
 			blockTranspose(block_thread->matrix, blockElements_2);
 			blockElementsTranspose(block_thread->matrix, blockElements_1, blockElements_2);
+			free(blockElements_2);
 		}
+		free(blockElements_1);
 	}
 	
 	pthread_mutex_lock(&BlockLock);

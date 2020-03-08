@@ -92,8 +92,8 @@ void DiagonalTransposition(int* matrix, int N, int num_threads)
 
 int main()
 {
-    int N = 128;
-    int num_threads = 8;
+    int N = 4096;
+    int num_threads = 1;
     int* matrix = GenerateMatrix(N);
 
     //Uncomment the following two lines to view the NxN matrix original matrix output

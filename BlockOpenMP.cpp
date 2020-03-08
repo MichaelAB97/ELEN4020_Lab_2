@@ -106,7 +106,9 @@ void BlockTransposition(int* matrix, int N, int num_threads)
 	    		    int *blockElements_2 = blockElement(block_2, N);
 		    	    blockTranspose(matrix, blockElements_2);
 			        blockElementsTranspose(matrix, blockElements_1, blockElements_2);
+                    free(blockElements_2);
 		        }
+                free(blockElements_1);
             }
         } 
     }
@@ -129,7 +131,7 @@ void DisplayMatrix(int *matrix, int N)
 
 int main()
 {
-    int N = 128;
+    int N = 4096;
     int num_threads = 8;
     int* matrix = GenerateMatrix(N);
 

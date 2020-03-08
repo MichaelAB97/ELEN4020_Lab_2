@@ -15,7 +15,7 @@ void DisplayMatrix(int *matrix, int N);
 
 int main ()
 {   
-    int N = 128; //Size of the Matrix
+    int N = 4096; //Size of the Matrix
 	int num_threads = 8; // Number of threads
     int* matrix = generateMatrix(N);
 
@@ -87,7 +87,7 @@ void transposeMatrix(int N, int* matrix_ptr, int num_threads)
     omp_set_num_threads(num_threads);
     #pragma omp parallel for
     for (int row=0; row<N; row++)
-    {
+    {   
         for (int col=row; col<N; col++)
         {
             int oldCoords[2] = {row, col};
