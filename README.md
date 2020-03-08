@@ -16,6 +16,7 @@ Commands to run the following programs:
 - BlockThreadAlgorithm.cpp: `./BlockThreadAlg`
 - NaiveOpenMP.cpp: `./NaiveOpenMP`
 - DiagonalOpenMP.cpp: `./DiagOpenMP`
+- BlockOpenMP.cpp: `./BlockOpenMP`
 
 4. To delete any binary files that were created during the building process run:
    `make clean`

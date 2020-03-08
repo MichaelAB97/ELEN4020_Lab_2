@@ -14,6 +14,8 @@ Terminal Command To execute NaiveOpenMP.cpp
 Terminal Command To execute DiagonalOpenMP.cpp
 ./DiagOpenMP
 
+Terminal Command To execute BlockOpenMP.cpp
+./BlockOpenMP
 
 To get rid of any binary files created in the build process type: "make clean" 
 in the terminal command window
