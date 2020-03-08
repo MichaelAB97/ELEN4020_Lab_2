@@ -156,7 +156,7 @@ void DiagonalThreadManager(int* matrix, int N, int num_threads)
 
 int main()
 {
-    int N = 4096; //Size of the Matrix
+    int N = 128; //Size of the Matrix
     int num_threads = 8; // Number of threads
     int* matrix = GenerateMatrix(N);
 
