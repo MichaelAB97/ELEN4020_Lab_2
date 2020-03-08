@@ -7,6 +7,8 @@
 using namespace std;
 using namespace std::chrono;
 
+/* This function dynamically generates a pointer to the first element of the matrix and populates 
+   the matrix with random numbers according to a randomly generated seed value between 0 and 100 */
 int* GenerateMatrix(int N)
 {
     int dimension = N*N;
@@ -25,7 +27,8 @@ int* GenerateMatrix(int N)
     return matrix;
 }
 
-
+/* This function makes use of an elements coordinates in the 2D matrix and returns the
+   element's position in the 1D matrix that was initially created. */
 int getElementPosition(int coords[2], int N)
 {
     int row = coords[0];
@@ -34,7 +37,9 @@ int getElementPosition(int coords[2], int N)
     return position;
 }
 
-
+/* This function takes in two elements and assigns each variable the other variable's value
+   by the use of a temp variable. For example: if a = 2 & b = 1, the result of the transposElement 
+   function will be a = 1 and b = 2 */
 void transposeElement(int* row_element, int* col_element)
 {
     int temp = *row_element;
@@ -42,7 +47,7 @@ void transposeElement(int* row_element, int* col_element)
     *col_element = temp;
 }
 
-
+//This Function displays the 2D matrix
 void DisplayMatrix(int* matrix, int N)
 {
     int dimension = N*N;
@@ -60,7 +65,8 @@ void DisplayMatrix(int* matrix, int N)
 
 }
 
-
+/*This function does the Diagonal Transposition using OpenMP
+  for a matrix that is passed by pointer*/
 void DiagonalTransposition(int* matrix, int N, int num_threads)
 {   
     omp_set_num_threads(num_threads); //set number of threads
@@ -82,9 +88,7 @@ void DiagonalTransposition(int* matrix, int N, int num_threads)
                 int element_position_2 = getElementPosition(element_coords,N);
                 transposeElement(matrix+element_position_1, matrix+element_position_2);
             }
-            
-        }
-        
+        } 
     }
 }
 
