@@ -8,6 +8,9 @@ Terminal Command To execute DThreadAlgorithm.cpp
 Terminal Command To execute BlockThreadAlgorithm.cpp
 ./BlockThreadAlg
 
+Terminal Command To execute NaiveOpenMP.cpp
+./NaiveAlg
+
 
 To get rid of any binary files created in the build process type: "make clean" 
 in the terminal command window
