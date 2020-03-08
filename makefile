@@ -1,4 +1,4 @@
-all: DThreadAlg BlockThreadAlg NaiveAlg
+all: DThreadAlg BlockThreadAlg NaiveOpenMP DiagOpenMP
 
 DThreadAlg: DThreadAlgorithm.o
 	g++ DThreadAlgorithm.o -o DThreadAlg -lpthread
@@ -12,10 +12,17 @@ BlockThreadAlg: BlockThreadAlgorithm.o
 BlockThreadAlgorithm.o: BlockThreadAlgorithm.cpp
 	g++ -c BlockThreadAlgorithm.cpp
 
-NaiveAlg: NaiveOpenMP.o
-	g++ -fopenmp -lgomp NaiveOpenMP.o -o NaiveAlg
+NaiveOpenMP: NaiveOpenMP.o
+	g++ -fopenmp -lgomp NaiveOpenMP.o -o NaiveOpenMP
 
 NaiveOpenMP.o: NaiveOpenMP.cpp
 	g++ -c NaiveOpenMP.cpp
+
+DiagOpenMP: DiagonalOpenMP.o
+	g++ -fopenmp -lgomp DiagonalOpenMP.o -o DiagOpenMP
+
+DiagonalOpenMP.o: DiagonalOpenMP.cpp
+	g++ -c DiagonalOpenMP.cpp
+
 clean:
-	rm *.o DThreadAlg BlockThreadAlg NaiveAlg
+	rm *.o DThreadAlg BlockThreadAlg NaiveOpenMP DiagOpenMP
