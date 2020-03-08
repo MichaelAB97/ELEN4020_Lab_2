@@ -85,7 +85,7 @@ void transposeElement(int* row_element, int* col_element)
 void transposeMatrix(int N, int* matrix_ptr, int num_threads)
 {   
     omp_set_num_threads(num_threads);
-    #pragma omp parallel for private(row,col)
+    #pragma omp parallel for
     for (int row=0; row<N; row++)
     {
         for (int col=row; col<N; col++)
