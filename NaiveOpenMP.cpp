@@ -10,22 +10,36 @@ int* generateMatrix(int N);
 int getElementPosition(int coords[2], int N);
 int getElement(int* matrix_ptr, int coords[2], int N);
 void transposeElement(int* row_element, int* col_element);
-void transposeMatrix(int N, int* matrix_ptr);
+void transposeMatrix(int N, int* matrix_ptr, int num_threads);
 void DisplayMatrix(int *matrix, int N);
 
 int main ()
 {   
-    int N = 5; //Size of the Matrix
-	//int num_threads = 8; // Number of threads
+    int N = 128; //Size of the Matrix
+	int num_threads = 8; // Number of threads
     int* matrix = generateMatrix(N);
 
-    cout << "Original Matrix";
-    DisplayMatrix(matrix, N);
+    //Uncomment the following two lines to view the NxN matrix original matrix output
+    /*cout << "Original Matrix";
+    DisplayMatrix(matrix, N);*/
 
-    transposeMatrix(N, matrix);
+    //Start the steady clock
+    std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
+    startClock = std::chrono::steady_clock::now();
 
-    cout << "Transposed Matrix";
-    DisplayMatrix(matrix, N);
+    transposeMatrix(N, matrix, num_threads);
+
+    //Pause the steady clock
+    endClock = std::chrono::steady_clock::now();
+    std::chrono::duration<double>elapsedTime = duration_cast<duration<double>>(endClock - startClock);
+
+    //Uncomment the following two lines to view the NxN matrix transposition output
+    /*cout << "Transposed Matrix";
+    DisplayMatrix(matrix, N);*/
+
+    cout << "\nNumber of Threads: " << num_threads << endl;
+    cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
+    cout << "Diagonal Transposition Elapsed Time in Seconds: " << elapsedTime.count() << endl; 
 
     return 0;
 }
@@ -68,15 +82,14 @@ void transposeElement(int* row_element, int* col_element)
     *col_element = temp;
 }
 
-void transposeMatrix(int N, int* matrix_ptr)
+void transposeMatrix(int N, int* matrix_ptr, int num_threads)
 {   
-     #pragma omp parallel num_threads(3)
-    {   
-        #pragma omp for
-        for (int row=0; row<N; row++)
+    omp_set_num_threads(num_threads);
+    #pragma omp parallel for private(row,col)
+    for (int row=0; row<N; row++)
+    {
+        for (int col=row; col<N; col++)
         {
-            for (int col=row; col<N; col++)
-            {
             int oldCoords[2] = {row, col};
             int oldPosition = getElementPosition(oldCoords, N);
             int element = getElement(matrix_ptr, oldCoords, N);
@@ -84,7 +97,6 @@ void transposeMatrix(int N, int* matrix_ptr)
             int newCoords[2] = {col, row};
             int newPosition = getElementPosition(newCoords, N);
             transposeElement(matrix_ptr+oldPosition, matrix_ptr+newPosition);
-            }
         }
     }
 }
