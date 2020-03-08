@@ -9,7 +9,8 @@ using namespace std::chrono;
 int* generateMatrix(int N);
 int getElementPosition(int coords[2], int N);
 int getElement(int* matrix_ptr, int coords[2], int N);
-int* transposeMatrix(int N, int* matrix_ptr);
+void transposeElement(int* row_element, int* col_element);
+void transposeMatrix(int N, int* matrix_ptr);
 void DisplayMatrix(int *matrix, int N);
 
 int main ()
@@ -21,10 +22,10 @@ int main ()
     cout << "Original Matrix";
     DisplayMatrix(matrix, N);
 
-    int* transposedMatrix = transposeMatrix(N, matrix);
+    transposeMatrix(N, matrix);
 
     cout << "Transposed Matrix";
-    DisplayMatrix(transposedMatrix, N);
+    DisplayMatrix(matrix, N);
 
     return 0;
 }
@@ -60,18 +61,21 @@ int getElement(int* matrix_ptr, int coords[2], int N)
     return *(matrix_ptr + getElementPosition(coords,N));
 }
 
-int* transposeMatrix(int N, int* matrix_ptr)
-{   
-    int dimension = N*N;
-    int *transposedMatrix =  (int* )calloc(dimension, sizeof(int));
-    int *transposedElementPtr = transposedMatrix;
+void transposeElement(int* row_element, int* col_element)
+{
+    int temp = *row_element;
+    *row_element = *col_element;
+    *col_element = temp;
+}
 
+void transposeMatrix(int N, int* matrix_ptr)
+{   
      #pragma omp parallel num_threads(3)
     {   
         #pragma omp for
         for (int row=0; row<N; row++)
         {
-            for (int col=0; col<N; col++)
+            for (int col=row; col<N; col++)
             {
             int oldCoords[2] = {row, col};
             int oldPosition = getElementPosition(oldCoords, N);
@@ -79,12 +83,10 @@ int* transposeMatrix(int N, int* matrix_ptr)
 
             int newCoords[2] = {col, row};
             int newPosition = getElementPosition(newCoords, N);
-            *(transposedMatrix + newPosition) = element;
+            transposeElement(matrix_ptr+oldPosition, matrix_ptr+newPosition);
             }
         }
     }
-
-    return transposedMatrix;
 }
 
 void DisplayMatrix(int *matrix, int N)

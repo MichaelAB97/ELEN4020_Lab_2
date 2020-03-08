@@ -1,4 +1,4 @@
-// Diagonal Transposition Algorithm using OpenMp
+// Block-Orientated Transposition Algorithm using OpenMp
 #include <iostream>
 #include <stdlib.h>
 #include <chrono>
@@ -31,9 +31,10 @@ int* GenerateMatrix(int N)
    element's position in the 1D matrix that was initially created. */
 int getElementPosition(int coords[2], int N)
 {
-    int row = coords[0];
-    int col = coords[1];
-    int position = (row*N) + col;
+	int row = coords[0];
+	int col = coords[1];
+    int position = ( row * N ) + col;
+
     return position;
 }
 
@@ -42,51 +43,87 @@ int getElementPosition(int coords[2], int N)
    function will be a = 1 and b = 2 */
 void transposeElement(int* row_element, int* col_element)
 {
-    int temp = *row_element;
+	int temp = *row_element;
     *row_element = *col_element;
     *col_element = temp;
 }
 
-//This Function displays the 2D matrix
-void DisplayMatrix(int* matrix, int N)
-{
-    int dimension = N*N;
+/* This function returns a pointer to the first element of a block */
+int *blockElement(int blockIndex, int N)
+{	
+	int block_number = N/2;
+	int *block_element_ptr = (int*)calloc(4,sizeof(int));
+	
+	*block_element_ptr =  (2*blockIndex)+ (blockIndex/block_number)*N;
+	block_element_ptr[1] = *block_element_ptr+1; 
+	block_element_ptr[2] = *block_element_ptr+N;
+	block_element_ptr[3] = *block_element_ptr+(N+1);
 
-    for (int i = 0; i < dimension; ++i)
-    {
-        if (i % N == 0)
-        {
-            cout << endl;
-        }
-        cout << *matrix << " ";
-        ++matrix;
-    }
-    cout << endl;
-
+	return block_element_ptr;
 }
 
-/*This function does the Diagonal Transposition using OpenMP
-  for a matrix that is passed by pointer*/
-void DiagonalTransposition(int* matrix, int N, int num_threads)
-{   
+/* This function does matrix transposition on a single block */
+void blockElementsTranspose(int *matrix, int *block_ij, int *block_ji)
+{	
+    for (int i = 0; i < 4; i++)
+    {
+        transposeElement(matrix+block_ij[i], matrix+block_ji[i]);
+    }
+}
+
+/* This function transposes the first elements of the blocks needed to be transposed */
+void blockTranspose(int *matrix, int *block_ptr)
+{
+	transposeElement(matrix+block_ptr[1], matrix+block_ptr[2]);
+}
+
+/* This function assigns each thread a transposition operation based on the operation index. 
+   A mutex lock is used to ensure that the threads wait for the thread that is 
+   currently accessing data to complete its operation before the next operation is executed.*/
+void BlockTransposition(int* matrix, int N, int num_threads)
+{
+    int block_number = N/2;
     omp_set_num_threads(num_threads); //set number of threads
 
     #pragma omp parallel private(i,j)
     {
         #pragma omp for schedule(dynamic) nowait
-        for (int i = 0; i < N-1; ++i)
+        for (int i = 0; i < block_number; ++i)
         {
-            for (int j = i+1; j < N; ++j)
+            for (int j = i; j < block_number; ++j)
             {
                 int element_coords[2] = {i,j};
-                int element_position_1 = getElementPosition(element_coords,N);
-                element_coords[0] = j;
-                element_coords[1] = i;
-                int element_position_2 = getElementPosition(element_coords,N);
-                transposeElement(matrix+element_position_1, matrix+element_position_2);
+		        int block_1 = getElementPosition(element_coords, block_number);
+		        int *blockElements_1 = blockElement( block_1, N);
+		        blockTranspose(matrix, blockElements_1);
+			
+		        if(j != i)
+		        {
+			        element_coords[0] = j;
+			        element_coords[1] = i;		
+
+    			    int block_2 = getElementPosition(element_coords, block_number);
+	    		    int *blockElements_2 = blockElement(block_2, N);
+		    	    blockTranspose(matrix, blockElements_2);
+			        blockElementsTranspose(matrix, blockElements_1, blockElements_2);
+		        }
             }
         } 
     }
+}
+
+//This Function displays the 2D matrix
+void DisplayMatrix(int *matrix, int N)
+{
+    int dimension = N*N;
+	for(int i=0; i< dimension; ++i)
+	{
+		if( i%N == 0)cout << endl;
+
+		cout << " " << *matrix;
+		++matrix;
+	}
+	cout << endl;
 }
 
 
@@ -104,7 +141,7 @@ int main()
     std::chrono::time_point<std::chrono::steady_clock> startClock, endClock;
     startClock = std::chrono::steady_clock::now();
     
-    DiagonalTransposition(matrix, N, num_threads);
+    BlockTransposition(matrix, N, num_threads);
     
     //Pause the steady clock
     endClock = std::chrono::steady_clock::now();
@@ -118,5 +155,5 @@ int main()
     cout << "Matrix Size: " << N << " by " << N << " matrix" << endl;
     cout << "Diagonal Transposition Elapsed Time in Seconds: " << elapsedTime.count() << endl; 
 
-    return 0; 
+    return 0;
 }

@@ -1,11 +1,9 @@
 // Diagonal Matrix Transposition Algorithm using Threads
-
 #include <pthread.h>
 #include <stdlib.h>
 #include <iostream>
 #include <stdio.h>
 #include <unistd.h>
-#include <time.h> 
 #include <chrono>
 
 using namespace std;
@@ -55,14 +53,6 @@ int getElementPosition(int coords[2], int N)
     int col = coords[1];
     int position = (row*N) + col;
     return position;
-}
-
-
-/* This function returns the value of the element by shifting the matrix element pointer
-   by the position returned from the getElementPosition function */
-int getElement(int* matrix_ptr, int coords[2], int N)
-{
-    return *(matrix_ptr + getElementPosition(coords,N));
 }
 
 /* This function takes in two elements and assigns each variable the other variable's value
@@ -166,7 +156,7 @@ void DiagonalThreadManager(int* matrix, int N, int num_threads)
 
 int main()
 {
-    int N = 4096; //Size of the Matrix
+    int N = 128; //Size of the Matrix
     int num_threads = 8; // Number of threads
     int* matrix = GenerateMatrix(N);
 
