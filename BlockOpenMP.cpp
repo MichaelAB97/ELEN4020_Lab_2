@@ -7,6 +7,8 @@
 using namespace std;
 using namespace std::chrono;
 
+/* This function dynamically generates a pointer to the first element of the matrix and populates 
+   the matrix with random numbers according to a randomly generated seed value between 0 and 100 */
 int* GenerateMatrix(int N)
 {
     int dimension = N*N;
@@ -25,7 +27,8 @@ int* GenerateMatrix(int N)
     return matrix;
 }
 
-
+/* This function makes use of an elements coordinates in the 2D matrix and returns the
+   element's position in the 1D matrix that was initially created. */
 int getElementPosition(int coords[2], int N)
 {
 	int row = coords[0];
@@ -35,7 +38,9 @@ int getElementPosition(int coords[2], int N)
     return position;
 }
 
-
+/* This function takes in two elements and assigns each variable the other variable's value
+   by the use of a temp variable. For example: if a = 2 & b = 1, the result of the transposElement 
+   function will be a = 1 and b = 2 */
 void transposeElement(int* row_element, int* col_element)
 {
 	int temp = *row_element;
@@ -43,7 +48,7 @@ void transposeElement(int* row_element, int* col_element)
     *col_element = temp;
 }
 
-
+/* This function returns a pointer to the first element of a block */
 int *blockElement(int blockIndex, int N)
 {	
 	int block_number = N/2;
@@ -57,7 +62,7 @@ int *blockElement(int blockIndex, int N)
 	return block_element_ptr;
 }
 
-
+/* This function does matrix transposition on a single block */
 void blockElementsTranspose(int *matrix, int *block_ij, int *block_ji)
 {	
     for (int i = 0; i < 4; i++)
@@ -66,13 +71,15 @@ void blockElementsTranspose(int *matrix, int *block_ij, int *block_ji)
     }
 }
 
-
+/* This function transposes the first elements of the blocks needed to be transposed */
 void blockTranspose(int *matrix, int *block_ptr)
 {
 	transposeElement(matrix+block_ptr[1], matrix+block_ptr[2]);
 }
 
-
+/* This function assigns each thread a transposition operation based on the operation index. 
+   A mutex lock is used to ensure that the threads wait for the thread that is 
+   currently accessing data to complete its operation before the next operation is executed.*/
 void BlockTransposition(int* matrix, int N, int num_threads)
 {
     int block_number = N/2;
@@ -105,7 +112,7 @@ void BlockTransposition(int* matrix, int N, int num_threads)
     }
 }
 
-
+//This Function displays the 2D matrix
 void DisplayMatrix(int *matrix, int N)
 {
     int dimension = N*N;
