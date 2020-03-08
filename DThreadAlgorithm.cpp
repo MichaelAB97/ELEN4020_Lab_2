@@ -1,5 +1,4 @@
 // Diagonal Matrix Transposition Algorithm using Threads
-
 #include <pthread.h>
 #include <stdlib.h>
 #include <iostream>
