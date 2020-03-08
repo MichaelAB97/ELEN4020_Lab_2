@@ -71,12 +71,9 @@ void DiagonalTransposition(int* matrix, int N, int num_threads)
 {   
     omp_set_num_threads(num_threads); //set number of threads
 
-    //Defining a specification of how iterations of associated loops are divided into contiguous non-empty subsets
-    int chunk_size = 10; // non-empty subsets
-
-    #pragma omp parallel private(next_diagonal)
+    #pragma omp parallel private(i,j)
     {
-        #pragma omp for schedule(dynamic, chunk_size) nowait
+        #pragma omp for schedule(dynamic) nowait
         for (int i = 0; i < N-1; ++i)
         {
             for (int j = i+1; j < N; ++j)
@@ -99,6 +96,7 @@ int main()
     int num_threads = 8;
     int* matrix = GenerateMatrix(N);
 
+    //Uncomment the following two lines to view the NxN matrix original matrix output
     /*cout << "Original Matrix";
     DisplayMatrix(matrix, N);*/
 
