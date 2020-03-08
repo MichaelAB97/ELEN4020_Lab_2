@@ -14,7 +14,8 @@ This lab utilizes [GNU make](https://www.gnu.org/software/make/manual/make.html#
 Commands to run the following programs:
 - DThreadAlgorithm.cpp: `./DThreadAlg`
 - BlockThreadAlgorithm.cpp: `./BlockThreadAlg`
-- NaiveOpenMP.cpp: `./NaiveAlg`
+- NaiveOpenMP.cpp: `./NaiveOpenMP`
+- DiagonalOpenMP.cpp: `./DiagOpenMP`
 
 4. To delete any binary files that were created during the building process run:
    `make clean`

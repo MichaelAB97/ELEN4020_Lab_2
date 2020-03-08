@@ -9,7 +9,10 @@ Terminal Command To execute BlockThreadAlgorithm.cpp
 ./BlockThreadAlg
 
 Terminal Command To execute NaiveOpenMP.cpp
-./NaiveAlg
+./NaiveOpenMP
+
+Terminal Command To execute DiagonalOpenMP.cpp
+./DiagOpenMP
 
 
 To get rid of any binary files created in the build process type: "make clean" 
