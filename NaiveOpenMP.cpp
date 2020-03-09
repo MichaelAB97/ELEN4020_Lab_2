@@ -15,7 +15,7 @@ void DisplayMatrix(int *matrix, int N);
 
 int main ()
 {   
-    int N = 4096; //Size of the Matrix
+    int N = 128; //Size of the Matrix
 	int num_threads = 8; // Number of threads
     int* matrix = generateMatrix(N);
 

@@ -131,7 +131,7 @@ void DisplayMatrix(int *matrix, int N)
 
 int main()
 {
-    int N = 4096;
+    int N = 128;
     int num_threads = 8;
     int* matrix = GenerateMatrix(N);
 
